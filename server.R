@@ -3,6 +3,7 @@ library(shiny)
 # Define server logic required to draw the plots
 shinyServer(function(input, output) {
   
+  #create plot
   output$plots<-renderPlot({
     #get alpha and lambda values from input
     alphaVal<-input$alpha
@@ -12,10 +13,13 @@ shinyServer(function(input, output) {
     maxVal<-alphaVal/lambdaVal+3*sqrt(alphaVal/lambdaVal^2)
     
     #Plotting sequence
-    x    <- seq(from=0,to=maxVal,by=0.001)
+    x <- seq(from=0,to=maxVal,by=0.001)
     
+    #set defaults
     if (is.na(alphaVal)){alphaVal<-1}
     if (is.na(lambdaVal)){lambdaVal<-1}
+    
+    #plotting things
     gamMax<-max(dgamma(x,shape=alphaVal,rate=lambdaVal))
     
     if(alphaVal>=1){
@@ -24,8 +28,11 @@ shinyServer(function(input, output) {
     }else{
       plot(x,y=1/x, ylab="Y=1/X",ylim=c(0,(1/meanVal)*2),main="Plot of Y=1/X and Taylor Approximations",type="l",lwd="3")
     }
+
+    #add in approximations
     lines(x,y=(1/meanVal)-(1/(meanVal)^2)*(x-meanVal),type="l",lwd="3",col="Blue")
     lines(x,y=(1/meanVal)-(1/(meanVal)^2)*(x-meanVal)+2*(1/meanVal^3)*(x-meanVal)^2/2,type="l",lwd="3",col="Orange")
+    
     legend(col=c("Black","Blue","Orange","Purple"),"topright",legend=c("True Curve","1st order","2nd order","Gamma Density"),pch=15)
     
     #overlay gamma density
@@ -33,6 +40,8 @@ shinyServer(function(input, output) {
     
   })
   
+  
+  #get approximations and compare
   output$vals<-renderTable({
     #get alpha and lambda values from input
     alphaVal<-input$alpha
@@ -43,8 +52,12 @@ shinyServer(function(input, output) {
     } else{
       truth<-Inf
     }
+    
+    #approximations
     first<-lambdaVal/alphaVal
     second<-lambdaVal*(alphaVal+1)/(alphaVal^2)
+    
+    #return
     data.frame(Method=c("Truth","1st Order Delta","2nd Order Delta"),
                Mean=c(truth,first,second),
                PerDiff=c(NA,(truth-first)/truth*100,(truth-second)/truth*100))
