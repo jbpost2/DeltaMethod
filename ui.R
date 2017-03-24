@@ -7,7 +7,7 @@
 library(shiny)
 library(shinydashboard)
 
-# Define UI for application that draws the prior and posterior distributions given a value of y
+
 dashboardPage(skin="red",
   dashboardHeader(title="Comparison of First and Second Order Delta Method",titleWidth=750),
   
